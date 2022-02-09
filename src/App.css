@@ -1,38 +1,298 @@
-.App {
-  text-align: center;
+.content{
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-top: 100vh;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.incident-report{
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-image: url("../images/incident.jpg");
+    background-size: cover;
+    z-index: 0;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.incident-report::after{
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: -1;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.incident-report__header{
+    text-align: center;
+    font-size: 3rem;
+    margin-top: 0;
+    margin-bottom: 25px;
+    color: #fff;
 }
 
-.App-link {
-  color: #61dafb;
+.incident-report__report{
+    display: block;
+    margin: 0 auto;
+    padding: 15px 150px;
+    border-radius: 5px;
+    border: none;
+    background-color: #FF3136;
+    color: #fff;
+    font-size: 1.8rem;
+    cursor: pointer;
+    transition: 0.4s;
+    box-shadow: rgba(0,0,0,0.5) 2px 2px 10px;
+
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.incident-report__report:hover,
+.incident-report__report:active,
+.incident-report__report:focus{
+    background-color: #cc272b;
+}
+
+.incident-report__down,
+.incident-report__down:visited{
+    position: absolute;
+    text-decoration: none;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%) rotate(90deg);
+    background-image: url("../images/chevron-rounded-solid.svg");
+    width: 2rem;
+    height: 2rem;
+}
+
+.incident-report__down:hover,
+.incident-report__down:focus,
+.incident-report__down:active{
+    animation-name: bounce;
+    animation-duration: 1s;
+    animation-fill-mode: both;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+}
+
+@keyframes bounce {
+    0%{ transform: translate(-50%, 0px) rotate(90deg) }
+    50%{ transform: translate(-50%, 5px) rotate(90deg) }
+    100%{ transform: translate(-50%, 0px) rotate(90deg) }
+}
+
+.active-incidents{
+    max-width: 800px;
+    padding-top: 25px;
+    padding-bottom: 50px;
+    margin: 0 auto;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+.active-incidents__header{
+    margin-top: 0;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.active-incidents__refresh{
+    width: 1.5rem;
+    height: 1.5rem;
+    padding: 0;
+    background-color: transparent;
+    border: none;
+    background-image: url("../images/refresh-outline.svg");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center center;
+    cursor: pointer;
+    transition: 0.4s;
+}
+
+.active-incidents__refresh.refreshing{
+    animation: rotate linear infinite 0.4s;
+}
+
+@keyframes rotate {
+    0% { transform: rotate(0deg) }
+    100% { transform: rotate(360deg) }
+}
+
+.active-incidents__card{
+    background-color: #E3DBDB;
+    padding: 15px 25px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+.active-incidents__card:last-child{
+    margin-bottom: 0;
+}
+
+
+
+.active-incidents__content{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+}
+
+.active-incidents__conclude{
+    border: none;
+    border-radius: 3px;
+    padding: 6px 10px;
+    color: #fff;
+    background-color: #FF5A5E;
+    cursor: pointer;
+    transition: 0.4s;
+}
+
+.active-incidents__conclude:hover,
+.active-incidents__conclude:active,
+.active-incidents__conclude:focus{
+    background-color: #cc484b;
+}
+
+.active-incidents__deactivate{
+    animation-name: deactivate;
+    animation-duration: 500ms;
+    animation-fill-mode: forwards;
+}
+
+.active-incidents__deactivate .active-incidents__details{
+    opacity: 0;
+}
+
+@keyframes deactivate {
+    0% {  }
+    50% { transform: translateX(110%); }
+    100% { height: 0; margin: 0; transform: translateX(110%);}
+}
+
+
+
+.takeover{
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 10;
+    padding: 25px 25px;
+    display: none;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.open{
+    display: flex;
+}
+
+.takeover__content{
+    width: 100%;
+    height: 100%;
+    max-width: 550px;
+    max-height: 650px;
+    margin: 0 auto;
+    background-color: #E3DBDB;
+    padding: 25px 15px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-radius: 5px;
+}
+
+.takeover__location-label{
+    display: block;
+    margin-bottom: 5px;
+}
+
+.takeover__street{
+    width: 100%;
+    padding: 10px 5px;
+    margin-bottom: 15px;
+}
+
+.takeover__row{
+    display: flex;
+    margin-bottom: 25px;
+}
+
+.takeover__city{
+    padding: 10px 5px;
+    margin-right: 10px;
+    width: 100%;
+}
+
+.takeover__state{
+    padding: 10px 5px;
+    margin-right: 10px;
+    width: 100%;
+}
+
+.takeover__zip{
+    padding: 10px 5px;
+    width: 100%;
+}
+
+.takeover__type{
+    padding: 5px 25px 5px 5px;
+    width: 100%;
+    margin-bottom: 25px;
+    background-color: #fff;
+}
+
+.takeover__type-label{
+    display: block;
+    margin-bottom: 5px;
+}
+
+.takeover__units-label{
+    display: block;
+    margin-bottom: 5px;
+}
+
+.takeover__units{
+    width: 100%;
+    padding: 10px 5px;
+}
+
+.takeover__buttons{
+    display: flex;
+    justify-content: center;
+}
+
+.takeover__cancel{
+    margin-right: 15px;
+}
+
+.takeover__submit,
+.takeover__cancel{
+    padding: 6px 10px;
+    cursor: pointer;
+    color: #fff;
+    background-color: #FF5A5E;
+    border-radius: 3px;
+    border: none;
+    transition: 0.4s;
+}
+
+.takeover__submit:hover,
+.takeover__submit:active,
+.takeover__submit:focus,
+.takeover__cancel:hover,
+.takeover__cancel:active,
+.takeover__cancel:focus{
+    background-color: #cc484b;
+}
+
+.takeover__error{
+    color: #FF0007;
 }
