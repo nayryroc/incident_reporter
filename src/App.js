@@ -148,12 +148,7 @@ class App extends React.Component{
      * @param {string} key The key of the incident
      */
     remIncident(key){
-        let updated = this.state.incidents.filter((i) => {
-                            if(i.key !== key){
-                                return true;
-                            }
-                            return false;
-                        })
+        let updated = this.state.incidents.filter((i) => { return i.key !== key; });
         this.setState({incidents: updated});
     }
 
@@ -300,7 +295,7 @@ class App extends React.Component{
                <div className={"incident-report"}>
                 <h2 className={"incident-report__header"}>New Incident</h2>
                 <button className={"incident-report__report"} onClick={this.openTakeover}>Report Incident</button>
-                   <a href="#active" className={"incident-report__down"}/>
+                   <a href="#active" className={"incident-report__down"} aria-label={"Scroll Down"}/>
                </div>
                <div className={"active-incidents"} id="active">
                 <h2 className={"active-incidents__header"}>Active Incidents <button className={"active-incidents__refresh"} onClick={()=>{this.updateState(); this.animateRefresh()}}/></h2>
@@ -321,6 +316,8 @@ class App extends React.Component{
                    </div>
                    );
                 }))}
+
+                   {this.state.incidents.length === 0 ? <div className={"active-incidents__card"}><div className="active-incident__content"><div className="active-incidents__none">No Active Incidents</div></div></div> : ''}
                </div>
            </div>
        );

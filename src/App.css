@@ -121,7 +121,7 @@
 
 @keyframes rotate {
     0% { transform: rotate(0deg) }
-    100% { transform: rotate(360deg) }
+    100% { transform: rotate(720deg) }
 }
 
 .active-incidents__card{
@@ -176,7 +176,9 @@
     100% { height: 0; margin: 0; transform: translateX(110%);}
 }
 
-
+.active-incidents__none{
+    text-align: center;
+}
 
 .takeover{
     position: fixed;
