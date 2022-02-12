@@ -20,6 +20,17 @@ code {
   margin: 0 auto;
 }
 
+@media(max-width: 750px){
+  .page{
+    padding: 0 35px;
+  }
+}
+@media(max-width: 450px){
+  .page{
+    padding: 0 25px;
+  }
+}
+
 .page.no-scroll{
   height: 100vh;
   overflow: hidden;
@@ -40,4 +51,16 @@ body, html{
 
 html{
   scroll-behavior: smooth;
+}
+
+@media(max-width: 850px){
+  html{
+    font-size: 14px;
+  }
+}
+
+@media(max-width: 600px){
+  html{
+    font-size: 12px;
+  }
 }
