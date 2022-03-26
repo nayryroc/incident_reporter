@@ -3,11 +3,15 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { Helmet } from 'react-helmet';
 
 ReactDOM.render(
   <React.StrictMode>
+      <Helmet>
+          <title>Incident Reporter</title>
+      </Helmet>
       <div className={"page"}>
-        <App />
+        <App></App>
       </div>
   </React.StrictMode>,
   document.getElementById('root')

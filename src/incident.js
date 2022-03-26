@@ -1,13 +1,15 @@
 class Incident {
-    constructor(units, responding, received_time, incident_complete, location, incident_type) {
+    constructor(created_at, eta, incident_complete, incident_type, location, responding, status, units, fire_departments) {
         this.units = units;
         this.responding = responding;
-        this.received_time = received_time;
+        this.created_at = created_at;
         this.incident_complete = incident_complete;
         this.location = location;
         this.incident_type = incident_type;
-        this.dateObj = new Date(this.received_time.toDate());
-
+        this.dateObj = new Date(this.created_at.toDate());
+        this.eta = eta;
+        this.status = status;
+        this.fire_departments = fire_departments;
     }
 
     /**
@@ -15,6 +17,14 @@ class Incident {
      */
     complete(){
         this.incident_complete = true;
+    }
+
+    /**
+     *
+     * @returns {String[]} fire department ids
+     */
+    getDepartments(){
+        return this.fire_departments;
     }
 
     /**
@@ -55,15 +65,18 @@ class Incident {
             return {
                 units: incident.units,
                 responding: incident.responding,
-                received_time: incident.received_time,
+                created_at: incident.created_at,
                 incident_complete: incident.incident_complete,
                 location: incident.location,
                 incident_type: incident.incident_type,
+                eta: incident.eta,
+                status: incident.status,
+                fire_departments: incident.fire_departments
             };
         },
         fromFirestore: function(snapshot, options){
             const data = snapshot.data(options);
-            return new Incident(data.units, data.responding, data.received_time, data.incident_complete, data.location, data.incident_type);
+            return new Incident(data.created_at, data.eta, data.incident_complete, data.incident_type, data.location, data.responding, data.status, data.units, data.fire_departments);
         }
     };
 

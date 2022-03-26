@@ -294,6 +294,18 @@
 .takeover__units{
     width: 100%;
     padding: 10px 5px;
+    margin-bottom: 15px;
+}
+
+.takeover__incident{
+    width: 100%;
+    padding: 10px 5px;
+    margin-bottom: 15px;
+}
+
+.takeover__incident-label{
+    display: block;
+    margin-bottom: 5px;
 }
 
 .takeover__buttons{
@@ -328,4 +340,15 @@
 
 .takeover__error{
     color: #FF0007;
+}
+
+
+.multiselect-container{
+    margin-bottom: 15px;
+}
+
+.searchWrapper.search-wrapper{
+    background-color: #fff;
+    border-radius: 0;
+    border: 1px  inset rgb(118, 118, 118);
 }

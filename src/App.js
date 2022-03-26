@@ -2,21 +2,25 @@ import './App.css';
 import db from './firebase';
 import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
-
+import Multiselect from "multiselect-react-dropdown";
 
 import React from "react";
 
 import {incidentConverter} from './incident';
 import Incident from './incident';
 import firebase from 'firebase/compat/app';
+import {logDOM} from "@testing-library/react";
 
 let timeout;
 class App extends React.Component{
+    multiselectRefTracker = React.createRef();
 
     state = {
         incidents: [],
-        incidentTypes: [],
+        departments: [],
+        department_names: [],
         invalid: false,
+        selected: [],
     }
 
 
@@ -31,12 +35,15 @@ class App extends React.Component{
         let page = document.getElementsByClassName('page')[0];
         page.classList.add('loading');
         //Load incident types into state
-        db.collection('incident_types').get().then((querySnapshot) => {
-            let types = [];
+        db.collection('fire_department').get().then((querySnapshot) => {
+            let dept = [];
+            let names = [];
             querySnapshot.docs.map(doc => {
-                types.push({data: doc.data().type_name, key: doc.id});
+                dept.push({data: doc.data().name, key: doc.id});
+                names.push(doc.data().name + " : " + doc.id);
             });
-            this.setState({incidentTypes : types})
+            this.setState({departments : dept});
+            this.setState({department_names : names});
             page.classList.remove('loading');
         }).catch((error) => {
             console.log("Error reading document: " + error);
@@ -44,7 +51,7 @@ class App extends React.Component{
 
 
         //load active incidents into state
-        db.collection('incident').where("incident_complete", "==", false).withConverter(incidentConverter).orderBy("received_time", "desc").get().then((querySnapshot) => {
+        db.collection('incident').where("incident_complete", "==", false).withConverter(incidentConverter).orderBy("created_at", "desc").get().then((querySnapshot) => {
             let arr = [];
             querySnapshot.docs.map(doc => {
                 arr.push({data: doc.data(), key: doc.id});
@@ -70,14 +77,14 @@ class App extends React.Component{
     /**
      * Returns the incident type.
      *
-     * @param {string} incidentTypeKey The key of the incident type.
+     * @param {string[]} deptKey The key of the department.
      */
-    getIncidentType(incidentTypeKey){
-        let types = this.state.incidentTypes;
-        let title = null
+    getDept(deptKey){
+        let types = this.state.departments;
+        let title = [];
 
         types.forEach((type) => {
-            if(type.key === incidentTypeKey) title = type.data;
+            if(deptKey.includes(type.key)) title.push(type.data);
         })
 
         return title;
@@ -168,6 +175,7 @@ class App extends React.Component{
     }
 
 
+
     /**
      * Close the takeover menu form
      */
@@ -177,7 +185,9 @@ class App extends React.Component{
         document.getElementsByClassName("takeover__state")[0].value = '';
         document.getElementsByClassName("takeover__zip")[0].value = '';
         document.getElementsByClassName("takeover__units")[0].value = '';
-        document.getElementsByClassName("takeover__option")[0].selected = true;
+        if(document.getElementsByClassName("takeover__option")[0] != null){
+            document.getElementsByClassName("takeover__option")[0].selected = true;
+        }
         document.getElementsByClassName("takeover")[0].style.opacity = 0;
 
         setTimeout(() => {
@@ -186,7 +196,9 @@ class App extends React.Component{
             document.getElementsByClassName("page")[0].classList.remove("no-scroll");
         },200)
 
+        this.setState({selected:[]});
 
+        this.multiselectRefTracker.current.resetSelectedValues();
         this.setState({invalid: false});
     }
 
@@ -221,22 +233,21 @@ class App extends React.Component{
         let state = document.getElementsByClassName("takeover__state")[0].value;
         let zip = document.getElementsByClassName("takeover__zip")[0].value;
         let units = document.getElementsByClassName("takeover__units")[0].value;
+        let type = document.getElementsByClassName("takeover__incident")[0].value;
 
-        let e = document.getElementsByClassName("takeover__type")[0];
-        let type = e.options[e.selectedIndex].value;
+        let fire_departments = [];
 
-        //find the key for the type value
-        this.state.incidentTypes.forEach((t) => {
-            if (t.data === type) {
-                type = t.key;
-            }
+        this.state.selected.map(value => {
+            fire_departments.push(value);
         });
+
 
         //reset the invalid state
         this.setState({invalid: false});
 
 
         let addr = (street + " " + city + " " + state + " " + zip);
+
 
         //Convert the units string to an array
         units = units.split(' ').filter((unit) => {
@@ -248,14 +259,29 @@ class App extends React.Component{
 
 
         //Make sure none of the fields are empty
-        if (street === '' || city === '' || state === '' || zip === '') {
+        if (street === '' || city === '' || state === '' || zip === '' || type === '') {
             this.setState({invalid: true});
-        }else if(units.length === 0){
+        }else if(units.length === 0 || this.state.selected.length <= 0){
             this.setState({invalid: true});
         }else{
-            this.submitIncident(new Incident(units, [], time, false, addr, type));
+            this.submitIncident(new Incident(time, {}, false, type, addr, [], {}, units, fire_departments));
         }
 
+    }
+
+    selectItem(selectedList, selectedItem){
+        let id = selectedItem.split(" : ")[1];
+        let selectedItems = this.state.selected;
+        selectedItems.push(id);
+        this.setState({selected:selectedItems});
+    }
+
+    removeItem(selectedList, removedItem){
+        let id = removedItem.split(" : ")[1];
+        let selectedItems = this.state.selected;
+
+        selectedItems = selectedItems.filter(v => {return v !== id});
+        this.setState({selected:selectedItems});
     }
 
     render(){
@@ -272,14 +298,19 @@ class App extends React.Component{
                                <input type="text" placeholder={"Zip"} className={"takeover__zip"}/>
                            </div>
 
-                           <label className={"takeover__type-label"} htmlFor={"incident_type"}>Incident Type</label>
-                           <select className="takeover__type" id={"incident_type"}>
-                               {
-                                   this.state.incidentTypes.map((type, idx) => {
-                                       return <option className={"takeover__option"} key={idx} value={type.data}>{type.data}</option>
-                                   })
-                               }
-                           </select>
+                           <label htmlFor={"fire-departments"} className={"takeover__units-label"}>Fire Departments</label>
+
+                           <Multiselect
+                               id={"fire-departments"}
+                               isObject={false}
+                               options={this.state.department_names}
+                               onSelect={(selectedList, selectedItem)=>{this.selectItem(selectedList, selectedItem)}}
+                               onRemove={(selectedList, selectedItem)=>{this.removeItem(selectedList, selectedItem)}}
+                               ref={this.multiselectRefTracker}
+                           />
+
+                           <label htmlFor={"incident_type"} className={"takeover__incident-label"}>Incident Type</label>
+                           <input type="text" name={"incident_type"} className={"takeover__incident"} placeholder={"Type"}/>
 
                            <label htmlFor={"incident_units"} className={"takeover__units-label"}>Units</label>
                            <input type="text" name={"incident_units"} className={"takeover__units"} placeholder={"Units"}/>
@@ -300,13 +331,12 @@ class App extends React.Component{
                <div className={"active-incidents"} id="active">
                 <h2 className={"active-incidents__header"}>Active Incidents <button className={"active-incidents__refresh"} onClick={()=>{this.updateState(); this.animateRefresh()}}/></h2>
                {this.state.incidents.map(((i, idx) => {
-                    let incidentType = this.getIncidentType(i.data.incident_type);
-
+                    let dept = this.getDept(i.data.getDepartments());
                    return (
                    <div key={idx} className={"active-incidents__card"} id={'card-' + idx}>
                        <div className={"active-incidents__content"}>
                            <div className="active-incidents__details">
-                               <p>{incidentType}</p>
+                               <div>{dept.map((str, idx) => <span key={idx}>{str}{(idx < dept.length-1) ? "," : "" } </span>)}</div>
                                <p>{i.data.getAddress()}</p>
                                <p>{i.data.getDate()} at {i.data.getTime()}</p>
                            </div>
