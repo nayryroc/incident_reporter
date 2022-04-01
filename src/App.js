@@ -185,6 +185,9 @@ class App extends React.Component{
         document.getElementsByClassName("takeover__state")[0].value = '';
         document.getElementsByClassName("takeover__zip")[0].value = '';
         document.getElementsByClassName("takeover__units")[0].value = '';
+        document.getElementsByClassName("takeover__incident")[0].value = '';
+        document.getElementsByClassName("takeover__is-fire")[0].checked = false;
+        document.getElementsByClassName("takeover__is-ems")[0].checked = false;
         if(document.getElementsByClassName("takeover__option")[0] != null){
             document.getElementsByClassName("takeover__option")[0].selected = true;
         }
@@ -234,6 +237,9 @@ class App extends React.Component{
         let zip = document.getElementsByClassName("takeover__zip")[0].value;
         let units = document.getElementsByClassName("takeover__units")[0].value;
         let type = document.getElementsByClassName("takeover__incident")[0].value;
+        let is_fire = document.getElementsByClassName("takeover__is-fire")[0].checked;
+        let is_ems = document.getElementsByClassName("takeover__is-ems")[0].checked;
+
 
         let fire_departments = [];
 
@@ -258,13 +264,14 @@ class App extends React.Component{
         let time = firebase.firestore.Timestamp.fromDate(new Date());
 
 
+
         //Make sure none of the fields are empty
-        if (street === '' || city === '' || state === '' || zip === '' || type === '') {
+        if (street === '' || city === '' || state === '' || zip === '' || type === '' || (!is_fire && !is_ems)) {
             this.setState({invalid: true});
         }else if(units.length === 0 || this.state.selected.length <= 0){
             this.setState({invalid: true});
         }else{
-            this.submitIncident(new Incident(time, {}, false, type, addr, [], {}, units, fire_departments));
+            this.submitIncident(new Incident(time, {}, false, type, addr, [], {}, units, fire_departments, is_fire, is_ems));
         }
 
     }
@@ -311,7 +318,16 @@ class App extends React.Component{
 
                            <label htmlFor={"incident_type"} className={"takeover__incident-label"}>Incident Type</label>
                            <input type="text" name={"incident_type"} className={"takeover__incident"} placeholder={"Type"}/>
-
+                            <div className="takeover__incident-checkboxes">
+                                <div>
+                                   <label htmlFor="fire">Fire</label>
+                                   <input type="checkbox" id={"fire"} className={"takeover__is-fire"}/>
+                                </div>
+                                <div>
+                                   <label htmlFor="ems">EMS</label>
+                                   <input type="checkbox" id={"ems"} className={"takeover__is-ems"}/>
+                                </div>
+                            </div>
                            <label htmlFor={"incident_units"} className={"takeover__units-label"}>Units</label>
                            <input type="text" name={"incident_units"} className={"takeover__units"} placeholder={"Units"}/>
                            { this.state.invalid ? <p className="takeover__error">Invalid Input</p> : '' }

@@ -300,7 +300,24 @@
 .takeover__incident{
     width: 100%;
     padding: 10px 5px;
+    margin-bottom: 5px;
+}
+
+.takeover__incident-checkboxes{
     margin-bottom: 15px;
+    display: flex;
+    gap: 15px;
+}
+
+.takeover__incident-checkboxes div{
+    display: flex;
+    align-items: center;
+}
+
+.takeover__incident-checkboxes input{
+    width: 1.25em;
+    height: 1.25em;
+    margin-left: 5px;
 }
 
 .takeover__incident-label{

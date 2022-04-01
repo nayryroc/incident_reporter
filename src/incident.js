@@ -1,5 +1,5 @@
 class Incident {
-    constructor(created_at, eta, incident_complete, incident_type, location, responding, status, units, fire_departments) {
+    constructor(created_at, eta, incident_complete, incident_type, location, responding, status, units, fire_departments, is_fire, is_ems) {
         this.units = units;
         this.responding = responding;
         this.created_at = created_at;
@@ -10,6 +10,8 @@ class Incident {
         this.eta = eta;
         this.status = status;
         this.fire_departments = fire_departments;
+        this.is_fire = is_fire;
+        this.is_ems = is_ems;
     }
 
     /**
@@ -71,12 +73,14 @@ class Incident {
                 incident_type: incident.incident_type,
                 eta: incident.eta,
                 status: incident.status,
-                fire_departments: incident.fire_departments
+                fire_departments: incident.fire_departments,
+                is_fire: incident.is_fire,
+                is_ems: incident.is_ems
             };
         },
         fromFirestore: function(snapshot, options){
             const data = snapshot.data(options);
-            return new Incident(data.created_at, data.eta, data.incident_complete, data.incident_type, data.location, data.responding, data.status, data.units, data.fire_departments);
+            return new Incident(data.created_at, data.eta, data.incident_complete, data.incident_type, data.location, data.responding, data.status, data.units, data.fire_departments, data.is_fire, data.is_ems);
         }
     };
 
