@@ -9,7 +9,6 @@ import React from "react";
 import {incidentConverter} from './incident';
 import Incident from './incident';
 import firebase from 'firebase/compat/app';
-import {logDOM} from "@testing-library/react";
 
 let timeout;
 class App extends React.Component{
@@ -271,6 +270,53 @@ class App extends React.Component{
         }else if(units.length === 0 || this.state.selected.length <= 0){
             this.setState({invalid: true});
         }else{
+            if(is_fire) {
+                for(let i = 0; i< fire_departments.length; i++)
+                {
+                    let dept = fire_departments[i];
+                    fetch('https://fcm.googleapis.com/fcm/send', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'key='+ process.env.REACT_APP_API_KEY
+
+                        },
+                        body: JSON.stringify({
+                            "to": "/topics/fire_" + dept,
+                            "restricted_package_name": "com.example.first_responder_app",
+                            "notification": {
+                                "title": "Fire Incident",
+                                "body": (type + '\n' + addr)
+                            }
+                        })
+
+                    }).then(r => {
+                    });
+                }
+            }
+            if(is_ems) {
+                for (let i = 0; i < fire_departments.length; i++) {
+                    let dept = fire_departments[i];
+                    fetch('https://fcm.googleapis.com/fcm/send', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'key=' + process.env.REACT_APP_API_KEY
+
+                        },
+                        body: JSON.stringify({
+                            "to": "/topics/EMS_" + dept,
+                            "restricted_package_name": "com.example.first_responder_app",
+                            "notification": {
+                                "title": "EMS Incident",
+                                "body": (type + '\n' + addr)
+                            }
+                        })
+
+                    }).then(r => {
+                    });
+                }
+            }
             this.submitIncident(new Incident(time, {}, false, type, addr, [], {}, units, fire_departments, is_fire, is_ems));
         }
 
